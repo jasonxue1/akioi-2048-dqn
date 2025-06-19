@@ -13,4 +13,5 @@ dependencies = [
   "numpy<2",
   "tqdm",
   "tensorboard>=2.19.0",
+  "jason-personal-lib>=0.1.2",
 ]
