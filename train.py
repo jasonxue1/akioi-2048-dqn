@@ -40,21 +40,31 @@ def load_or_create(resume: str | None, env):
         if Path(resume).is_file():
             print(f"▶ Loading local checkpoint: {resume}")
             return DQN.load(resume, env=env, device=DEVICE)
-        print(f"▶ Loading from Hugging Face: {resume}")
-        return load_from_hub(resume, "model.zip", env=env, device=DEVICE)
 
+        # ---------- HF repo ----------
+        print(f"▶ Loading from Hugging Face: {resume}")
+        # ① 下载文件，得到本地路径
+        zip_path = load_from_hub(repo_id=resume, filename="model.zip")
+        # ② 再交给 SB3 读取
+        return DQN.load(zip_path, env=env, device=DEVICE)
+
+    # ---------- 新模型 ----------
     print("▶ Creating new model")
+    big_arch = [1024, 1024, 512]
     return DQN(
         "MlpPolicy",
         env,
-        learning_rate=2.5e-4,
-        buffer_size=1_000_000,
+        learning_rate=1.5e-4,
+        buffer_size=3_000_000,
         batch_size=1024,
         target_update_interval=10_000,
         verbose=1,
-        tensorboard_log="./tb",  # 如需也移到 runs/ 可自行改
+        tensorboard_log="./tb",
         device=DEVICE,
-        policy_kwargs=dict(net_arch=[512, 512, 256]),
+        policy_kwargs=dict(
+            net_arch=big_arch,
+            # dueling=True,
+        ),
     )
 
 
@@ -94,23 +104,32 @@ def main():
     local_zip = run_dir / f"dqn_akioi2048_{int(time.time())}.zip"
     model.save(str(local_zip))
     print(f"✓ Saved → {local_zip}")
-
     # --- 上传（可选）
     if args.hf_repo:
-        print(f"↑ Uploading {local_zip.name} to https://huggingface.co/{args.hf_repo}")
-        token = HfApi().token  # 需已 login
+        token = HfApi().token  # 已 login
         create_repo(args.hf_repo, exist_ok=True, token=token)
 
+        # 1) 历史归档版本
         upload_file(
             repo_id=args.hf_repo,
             path_or_fileobj=str(local_zip),
-            path_in_repo=local_zip.name,
+            path_in_repo=f"versions/{local_zip.name}",  # e.g. versions/dqn_...zip
             token=token,
-            commit_message=f"+{args.timesteps:,} steps on {time.ctime()}",
+            commit_message=f"add {local_zip.name}",
         )
-        print("✔ Upload done")
 
-    env.close()
+        # 2) 最新版本覆盖 model.zip
+        upload_file(
+            repo_id=args.hf_repo,
+            path_or_fileobj=str(local_zip),
+            path_in_repo="model.zip",
+            token=token,
+            commit_message=f"update model.zip → {local_zip.name}",
+        )
+
+        print("✔ Upload done: kept history + updated model.zip")
+
+        env.close()
 
 
 if __name__ == "__main__":

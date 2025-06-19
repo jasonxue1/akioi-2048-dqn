@@ -33,9 +33,9 @@ class Akioi2048Env(Env):
     def step(self, action: int):
         new_board, delta, msg = STEP_FN(self.board, int(action))
         terminated = msg != 0
-        reward = delta
         self.board = new_board
         self.score += delta
+        reward = self.score
         info = {"msg": msg, "score": self.score}
         return np.array(self.board, dtype=np.int32), reward, terminated, False, info
 
