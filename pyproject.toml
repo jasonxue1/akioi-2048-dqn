@@ -1,0 +1,16 @@
+[project]
+name = "akioi-2048-rl"
+version = "0.1.0"
+requires-python = ">=3.9,<3.10"
+
+dependencies = [
+  "akioi-2048>=0.2.0",
+  "gymnasium==0.29.1",
+  "stable-baselines3==2.3.2",
+  "huggingface_sb3",
+  "huggingface_hub",
+  "torch==2.2.2", # 官方 CPU 版，已同时支持 MPS
+  "numpy<2",
+  "tqdm",
+  "tensorboard>=2.19.0",
+]

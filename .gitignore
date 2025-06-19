@@ -1,0 +1,55 @@
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.swp
+*.bak
+*.tmp
+*.log
+
+# virtual-envs
+.venv/
+env/
+venv/
+
+# Jupyter & IPython
+.ipynb_checkpoints/
+.profile_default/
+*.ipynb
+
+# pytest / coverage / mypy
+.cache/
+.tox/
+coverage.*
+htmlcov/
+.mypy_cache/
+
+# ───────────────────── Project-specific artifacts ───────────────────
+# Stable-Baselines3 checkpoints & TensorBoard logs
+checkpoints/
+tb/
+
+# Hugging Face Hub temporary files
+hub/
+
+# Gymnasium monitor videos (if you ever record locally)
+videos/
+
+# Local run outputs
+*.mp4
+*.gif
+*.webm
+*.npy
+*.npz
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# macOS & Windows system junk
+.DS_Store
+Thumbs.db
