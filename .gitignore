@@ -30,6 +30,7 @@ htmlcov/
 # Stable-Baselines3 checkpoints & TensorBoard logs
 checkpoints/
 tb/
+runs/
 
 # Hugging Face Hub temporary files
 hub/
